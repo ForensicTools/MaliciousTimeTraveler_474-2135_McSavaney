@@ -10,6 +10,21 @@ function dump_inode ()
     stat -f '"%N" %i' "$1"
 }
 
+function dump_inodes ()
+{
+    if [[ -z $1 ]]; then
+        while read FILE; do
+            dump_inode "$FILE"
+        done
+    else
+        for FILE in "$@"; do
+            dump_inode "$FILE"
+        done
+    fi
+        
+}
+
+
 function diff_inodes ()
 {
     if [[ -z $2 ]]; then
