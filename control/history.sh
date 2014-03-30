@@ -7,6 +7,10 @@ if ! declare -f dump_inode >/dev/null; then
     source dump_inode.sh
 fi
 
+if ! declare -f get_colors >/dev/null; then
+    source ../view/colors.sh
+fi
+
 if ! declare -f reduce_path >/dev/null; then
     source file_info.sh
 fi
@@ -44,7 +48,7 @@ function file_history ()
     fi
 
     echo "DEBUG: finding ${MACHDIR}/${DIR_RGX}/${TARGET}"
-    dump_inodes "${MACHDIR}"/${DIR_RGX}/"${TARGET}"
+    dump_inodes "${MACHDIR}"/${DIR_RGX}/"${TARGET}"    
     #echo ${MACHDIR}/${DIR_RGX}/${TARGET} | sed 's/[^\\] /\\ /g' | dump_inodes
     #for FILE in ${TARGET}/${DIR_RGX}
     #find "$BACKUP" -path ".*${TARGET}" -prune 2>/dev/null | dump_inodes
