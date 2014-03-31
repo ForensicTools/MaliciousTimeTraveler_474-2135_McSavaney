@@ -7,7 +7,7 @@ function dump_inode ()
         return 1
     fi
 
-    stat -f '"%N" %i' "$1"
+    stat -f '%i "%N"' "$1"
 }
 
 function dump_inodes ()

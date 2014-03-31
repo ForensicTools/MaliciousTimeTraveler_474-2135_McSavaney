@@ -13,20 +13,21 @@ function get_volume ()
 
 function reduce_path ()
 {
+    REDUCABLES="/\.\./|//|/\./"
     if [[ -z $1 ]]; then
         echo "ERROR: reduce_path requires a path argument." >&2
         return 1
     fi 
-    
+ 
     P="$1"
 
-    while [[ $P =~ /../|//|/./ ]]; do
+    while [[ $P =~ $REDUCABLES ]]; do
         P="$( echo "$P" | sed -E \
             -e "s%/[^\.\.][^/]+/\.\./%/%g" \
             -e "s%^/\.\./%/%g" \
-            -e "s%/+%/%g" \
+            -e "s%//%/%g" \
             -e "s%/\./%/%g" )"
     done
 
-    echo $P
+    echo "$P"
 }

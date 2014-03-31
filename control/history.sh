@@ -17,6 +17,7 @@ fi
 
 function file_history ()
 {
+    shopt -s globstar
     if [[ -z $1 ]]; then
         echo "ERROR: file_history requires a file argument." >&2
         return 1
@@ -47,8 +48,36 @@ function file_history ()
         fi
     fi
 
-    echo "DEBUG: finding ${MACHDIR}/${DIR_RGX}/${TARGET}"
-    dump_inodes "${MACHDIR}"/${DIR_RGX}/"${TARGET}"    
+    COLORS=( `get_colors` )
+
+    declare -A inodecolors
+    FG=0
+    BG=0
+    
+    TARGETPATH=`reduce_path "${MACHDIR}/${DIR_RGX}/${TARGET}"`
+
+    INODE_TABLE="`dump_inodes ${TARGETPATH}`"
+    if [[ -z $INODE_TABLE ]]; then
+        echo "Failed to detect any matches." >&2
+        exit 1
+    fi
+
+    echo "$INODE_TABLE" | while read LINE; do
+        inode="`echo $LINE | cut -d' ' -f1`"
+        if [[ -z ${inodecolors[$inode]} ]]; then
+            FG_COLOR=${COLORS[$FG]}
+            BG_COLOR=${COLORS[$BG]}
+            inodecolors[$inode]="\033[${FG_COLOR};${BG_COLOR}m"
+            FG=$(( FG + 1 ))
+            if [[ $FG -eq ${#FOREGROUNDS} ]]; then
+                FG=0
+                BG=$(( BG + 1 ))
+            fi
+        fi
+        set_color ${inodecolors[$inode]}
+        echo $inode
+    done
+    reset_color
     #echo ${MACHDIR}/${DIR_RGX}/${TARGET} | sed 's/[^\\] /\\ /g' | dump_inodes
     #for FILE in ${TARGET}/${DIR_RGX}
     #find "$BACKUP" -path ".*${TARGET}" -prune 2>/dev/null | dump_inodes
