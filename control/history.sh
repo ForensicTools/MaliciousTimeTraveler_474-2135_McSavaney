@@ -3,17 +3,17 @@
 # history.sh
 # looks back at the history for a given file or directory
 
-if ! declare -f dump_inode >/dev/null; then
+#if ! declare -f dump_inode >/dev/null; then
     source dump_inode.sh
-fi
+#fi
 
-if ! declare -f get_colors >/dev/null; then
+#if ! declare -f get_colors >/dev/null; then
     source ../view/colors.sh
-fi
+#fi
 
-if ! declare -f reduce_path >/dev/null; then
+#if ! declare -f reduce_path >/dev/null; then
     source file_info.sh
-fi
+#fi
 
 function file_history ()
 {
@@ -29,7 +29,7 @@ function file_history ()
     CURRENT=( $( dump_inode "$TARGET" ) ) #this is a two element array
     if [[ $? -ne 0 ]]; then
         echo "WARNING: $1 not found in existing directory structure." >&2
-        echo "NOTE: $1 was reduced to $TARGET" >/&2
+        echo "NOTE: $1 was reduced to $TARGET" >&2
     fi
    
     DIR_RGX="*/*"
@@ -48,11 +48,19 @@ function file_history ()
         fi
     fi
 
-    COLORS=( `get_colors` )
+    #COLORS=( `get_colors` )
+    MAX_COLOR="$( tput colors )"
+    HEAD=0
+    TAIL=0
+    #if [[ $MAX_COLOR -eq 256 ]]; then
+    #    HEAD=16 #skip ugly, sporadic ANSI colors
+    #    TAIL=24 #skip greyscale values at the end
+    #fi     #don't need this if doing HSV
+
 
     declare -A inodecolors
-    FG=0
-    BG=0
+    local _FG=0
+    local _BG=16
     
     TARGETPATH=`reduce_path "${MACHDIR}/${DIR_RGX}/${TARGET}"`
 
@@ -61,23 +69,48 @@ function file_history ()
         echo "Failed to detect any matches." >&2
         exit 1
     fi
+    
+    COLOR_INCREMENT=$( echo "$INODE_TABLE" | cut -d' ' -f1 | sort -u | wc -l )
+    COLOR_INCREMENT=$(( 360 / COLOR_INCREMENT ))
+    # +1 because zero-indexing
 
-    echo "$INODE_TABLE" | while read LINE; do
+    while read LINE; do
         inode="`echo $LINE | cut -d' ' -f1`"
-        if [[ -z ${inodecolors[$inode]} ]]; then
-            FG_COLOR=${COLORS[$FG]}
-            BG_COLOR=${COLORS[$BG]}
-            inodecolors[$inode]="\033[${FG_COLOR};${BG_COLOR}m"
-            FG=$(( FG + 1 ))
-            if [[ $FG -eq ${#FOREGROUNDS} ]]; then
-                FG=0
-                BG=$(( BG + 1 ))
+        if [[ -z ${inodecolors[$inode]+abc} ]]; then
+            if [[ $_FG -eq $_BG ]]; then
+                _FG="$(( _FG + COLOR_INCREMENT ))"
+                if [[ $_FG -ge 360 ]]; then
+                    _FG="$HEAD"
+                    _BG="$(( _BG + COLOR_INCREMENT ))"
+                fi
+                if [[ $_BG -ge 360 ]]; then
+                    _BG="$HEAD"
+                fi
+            fi
+            FG_COLOR=$(( $( hsv2rgb $_FG 5 5 ) + 16 ));
+            #BG_COLOR=${COLORS[$BG]}
+            inodecolors[$inode]=$( tput setaf $FG_COLOR ; tput setab $_BG )
+            
+            _FG=$(( _FG + COLOR_INCREMENT ))
+
+            if [[ $_FG -ge 360 ]]; then
+                _FG="$HEAD"
+                _BG="$(( _BG + COLOR_INCREMENT ))"
+            fi
+            if [[ $_BG -ge 360 ]]; then
+                _BG="$HEAD"
             fi
         fi
-        set_color ${inodecolors[$inode]}
-        echo $inode
-    done
-    reset_color
+        #set_color ${inodecolors[$inode]}
+        echo -n ${inodecolors[$inode]}
+        printf "%-9s  :  " "$inode"
+        echo -n "$LINE" | cut -d' ' -f2- | xargs echo -n
+        reset_colors
+        echo
+    done <<< "$INODE_TABLE"
+    # the above allows us to process our table without creating a subprocess
+
+    #reset_colors
     #echo ${MACHDIR}/${DIR_RGX}/${TARGET} | sed 's/[^\\] /\\ /g' | dump_inodes
     #for FILE in ${TARGET}/${DIR_RGX}
     #find "$BACKUP" -path ".*${TARGET}" -prune 2>/dev/null | dump_inodes

@@ -9,65 +9,43 @@ function reset_colors ()
     tput sgr0
 }
 
-function get_colors()
+function hsv2rgb()
 {
-    echo "default black red green yellow blue pink cyan lgray dgray lred lgreen lyellow lblue lpink lcyan white"
-    
+    h="$1"
+    s="$2"
+    v="$3"
+
+    i=$( echo "$h/60" | bc )
+    h=$( echo -e "scale=4\n $h/60" | bc ) 
+    f=$( echo  "$h - $i" | bc )
+    p=$( echo "($v * (6 - $s)) / 6" | bc )
+    q=$( echo "($v * (6 - $s * $f)) / 6" | bc )
+    t=$( echo "($v * (6 - $s * (1 - $f))) / 6" | bc )
+
+    case $i in
+        0)
+            echo "$(( v * 36 + t * 6 + p ))"
+            ;;
+
+        1)
+            echo "$(( q * 36 + v * 6 + p ))"
+            ;;
+
+        2)
+            echo "$(( p * 36 + v * 6 + t ))"
+            ;;
+
+        3)
+            echo "$(( p * 36 + q * 6 + v ))"
+            ;;
+
+        4)
+            echo "$(( t * 36 + p * 6 + v ))"
+            ;;
+
+        5)
+            echo "$(( v * 36 + p * 6 + q ))"
+            ;;
+    esac
 }
 
-function set_color ()
-{
-    if [[ -z $1 ]]; then
-        reset_colors
-        return 0
-    fi
-    
-
-    declare -A FOREGROUNDS
-    declare -A BACKGROUNDS
-
-    FOREGROUNDS[default]=39
-    FOREGROUNDS[black]=30
-    FOREGROUNDS[red]=31
-    FOREGROUNDS[green]=32
-    FOREGROUNDS[yellow]=33
-    FOREGROUNDS[blue]=34
-    FOREGROUNDS[pink]=35
-    FOREGROUNDS[cyan]=36
-    FOREGROUNDS[lgray]=37
-    FOREGROUNDS[dgray]=90
-    FOREGROUNDS[lred]=91
-    FOREGROUNDS[lgreen]=92
-    FOREGROUNDS[lyellow]=93
-    FOREGROUNDS[lblue]=94
-    FOREGROUNDS[lpink]=95
-    FOREGROUNDS[lcyan]=96
-    FOREGROUNDS[white]=97
-    
-    BACKGROUNDS[default]=49
-    BACKGROUNDS[black]=40
-    BACKGROUNDS[red]=41
-    BACKGROUNDS[green]=42
-    BACKGROUNDS[yellow]=43
-    BACKGROUNDS[blue]=44
-    BACKGROUNDS[pink]=45
-    BACKGROUNDS[cyan]=46
-    BACKGROUNDS[lgray]=47
-    BACKGROUNDS[dgray]=100
-    BACKGROUNDS[lred]=101
-    BACKGROUNDS[lgreen]=102
-    BACKGROUNDS[lyellow]=103
-    BACKGROUNDS[lblue]=104
-    BACKGROUNDS[lpink]=105
-    BACKGROUNDS[lcyan]=106
-    BACKGROUNDS[white]=107
-
-
-    FG=${FOREGROUNDS[$1]}
-    BG=${BACKGROUNDS[$2]}
-    if [[ -z $BG ]]; then
-        BG=49
-    fi
-        
-    echo -en "\033[${FG};${BG}m"
-}
