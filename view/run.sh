@@ -14,3 +14,5 @@ if [[ -z ${COMMAND_WRAPPERS[$command_selection]} ]]; then
 fi
 
 ${COMMAND_WRAPPERS[$command_selection]}
+
+reset
