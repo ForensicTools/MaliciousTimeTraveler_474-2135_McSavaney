@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./bash_menu_ui/tui.sh
+. ./ui/tui.sh
 . ../model/wrappers.sh
 
 TOP_LANE=2

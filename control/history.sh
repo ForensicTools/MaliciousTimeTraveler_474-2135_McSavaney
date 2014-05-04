@@ -3,17 +3,17 @@
 # history.sh
 # looks back at the history for a given file or directory
 
-#if ! declare -f dump_inode >/dev/null; then
-#    source dump_inode.sh
-#fi
+if ! declare -f dump_inode >/dev/null; then
+    source ../control/dump_inode.sh
+fi
 
-#if ! declare -f get_colors >/dev/null; then
-#    source ../view/colors.sh
-#fi
+if ! declare -f get_colors >/dev/null; then
+    source ../view/colors.sh
+fi
 
-#if ! declare -f reduce_path >/dev/null; then
-#    source file_info.sh
-#fi
+if ! declare -f reduce_path >/dev/null; then
+    source ../control/file_info.sh
+fi
 
 function file_history ()
 {
