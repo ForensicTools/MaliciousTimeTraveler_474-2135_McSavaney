@@ -1,0 +1,3 @@
+[submodule "view/ui"]
+	path = view/ui
+	url = https://github.com/mcsaucy/bash_menu_ui.git
