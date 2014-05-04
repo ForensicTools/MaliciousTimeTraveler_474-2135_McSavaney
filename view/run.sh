@@ -4,7 +4,7 @@
 . ../model/wrappers.sh
 
 TOP_LANE=2
-MENU_OPTIONS=("Get file history" "View drift between backups" "Compare backups")
+MENU_OPTIONS=( "${COMMAND_DESC[@]}" )
 TITLE="Select a command to run:"
 show_menu_quit
 command_selection="$?"
