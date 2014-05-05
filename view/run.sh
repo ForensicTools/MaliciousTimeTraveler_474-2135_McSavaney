@@ -1,5 +1,7 @@
 #!/bin/bash
 
+trap "{ reset; exit 1; }" EXIT SIGINT
+
 . ./ui/tui.sh
 . ../model/wrappers.sh
 
@@ -15,4 +17,7 @@ fi
 
 ${COMMAND_WRAPPERS[$command_selection]}
 
+read -p "Press ENTER to continue"
+
+source "$0"
 reset
