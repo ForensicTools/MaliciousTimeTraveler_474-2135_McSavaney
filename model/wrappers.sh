@@ -19,8 +19,15 @@ get_drift()
 
 get_drift_setup()
 {
-    TMDIR="$( tmutil machinedirectory )" || return 1
-    get_drift "$TMDIR"
+    shopt -s nocasematch
+    echo "WARNING: this usually takes an incredibly long time."
+    read -p "Are you sure you want to proceed? [Y/n] " SOPHIESCHOICE
+    if [[ $SOPHIESCHOICE =~ "n" ]]; then
+        echo "Yeah, I don't really blame you..."
+    else
+        TMDIR="$( tmutil machinedirectory )" || return 1
+        get_drift "$TMDIR"
+    fi
 }
 
 get_diff()
