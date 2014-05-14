@@ -2,9 +2,9 @@
 
 . ../control/history.sh
 
-COMMANDS=("file_history" "get_drift" "get_diff" "get_dest_info")
-COMMAND_DESC=("Get a file's history" "View the drift between backups" "Compare backups" "Get TM destination information")
-COMMAND_WRAPPERS=("file_history_setup" "get_drift_setup" "get_diff_setup" "get_dest_info")
+COMMANDS=("file_history" "get_drift" "get_diff" "get_dest_info" "get_status")
+COMMAND_DESC=("Get a file's history" "View the drift between backups" "Compare backups" "Get TM destination information" "Get current TM status")
+COMMAND_WRAPPERS=("file_history_setup" "get_drift_setup" "get_diff_setup" "get_dest_info" "get_status")
 
 file_history_setup()
 {
@@ -39,4 +39,9 @@ get_diff_setup()
 get_dest_info()
 {
     tmutil destinationinfo
+}
+
+get_status()
+{
+    tmutil currentphase
 }
