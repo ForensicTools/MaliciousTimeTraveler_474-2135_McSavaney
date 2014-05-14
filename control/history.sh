@@ -3,17 +3,17 @@
 # history.sh
 # looks back at the history for a given file or directory
 
-#if ! declare -f dump_inode >/dev/null; then
-    source dump_inode.sh
-#fi
+if ! declare -f dump_inode >/dev/null; then
+    source ../control/dump_inode.sh
+fi
 
-#if ! declare -f get_colors >/dev/null; then
+if ! declare -f get_colors >/dev/null; then
     source ../view/colors.sh
-#fi
+fi
 
-#if ! declare -f reduce_path >/dev/null; then
-    source file_info.sh
-#fi
+if ! declare -f reduce_path >/dev/null; then
+    source ../control/file_info.sh
+fi
 
 function file_history ()
 {
@@ -23,9 +23,8 @@ function file_history ()
         return 1
     fi
 
-    declare -A AA #associative array of filename to inode
-
     TARGET=$( reduce_path "$1" )
+    TARGETPATH=""
     CURRENT=( $( dump_inode "$TARGET" ) ) #this is a two element array
     if [[ $? -ne 0 ]]; then
         echo "WARNING: $1 not found in existing directory structure." >&2
@@ -52,15 +51,15 @@ function file_history ()
     MAX_COLOR="$( tput colors )"
     HEAD=0
     TAIL=0
-    #if [[ $MAX_COLOR -eq 256 ]]; then
-    #    HEAD=16 #skip ugly, sporadic ANSI colors
-    #    TAIL=24 #skip greyscale values at the end
-    #fi     #don't need this if doing HSV
+    if [[ $MAX_COLOR -eq 256 ]]; then
+        HEAD=16 #skip ugly, sporadic ANSI colors
+        TAIL=24 #skip greyscale values at the end
+    fi     #don't need this if doing HSV
 
 
     declare -A inodecolors
     local _FG=0
-    local _BG=16
+    local _BG=$HEAD
     
     TARGETPATH=`reduce_path "${MACHDIR}/${DIR_RGX}/${TARGET}"`
 
@@ -87,8 +86,8 @@ function file_history ()
                     _BG="$HEAD"
                 fi
             fi
-            FG_COLOR=$(( $( hsv2rgb $_FG 5 5 ) + 16 ));
-            #BG_COLOR=${COLORS[$BG]}
+            FG_COLOR=$(( $( hsv2rgb $_FG 5 5 ) + $HEAD ));
+            BG_COLOR=${COLORS[$BG]}
             inodecolors[$inode]=$( tput setaf $FG_COLOR ; tput setab $_BG )
             
             _FG=$(( _FG + COLOR_INCREMENT ))
