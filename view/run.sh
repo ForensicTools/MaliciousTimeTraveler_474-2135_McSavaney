@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap "{ reset; exit 1; }" EXIT SIGINT
+trap "{ reset; exit 1; }" SIGINT
 
 . ./ui/tui.sh
 . ../model/wrappers.sh
