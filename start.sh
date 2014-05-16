@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ 4 > ${BASH_VERSINFO[0]} ]]; then
     echo "FATAL: THIS PROGRAM USES FEATURES ADDED IN BASH V4" >&2
