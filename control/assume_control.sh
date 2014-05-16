@@ -24,14 +24,15 @@ function assuming_control()
 function substitute()
 {
     # not as potentially damaging as seatbelt-less arbitrary command execution
-    # if you use cat to overwrite a file you will NOT change its inode number
+    # if you use dd to overwrite a file you will NOT change its inode number
     find /System/Library/Extensions/TMSafetyNet.kext -name bypass -exec {} \
-        cat "$2" > "$1" \;
+        dd if="$2" of="$1" \;
 }
 
 function edit_in_place()
 {
     # technically, people can also execute arbitrary commands from vim.
     # but that's dumb.
-    vim "+set nobackup" "+set nowritebackup" "$1"
+    find /System/Library/Extensions/TMSafetyNet.kext -name bypass -exec {} \
+        vim "+set nobackup" "+set nowritebackup" "$1" \;
 }
