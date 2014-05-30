@@ -1,12 +1,13 @@
 #!/bin/bash
 
-trap "{ reset; exit 1; }" EXIT SIGINT
+trap "{ reset; exit 1; }" SIGINT
 
 . ./ui/tui.sh
 . ../model/wrappers.sh
 
 TOP_LANE=2
 MENU_OPTIONS=( "${COMMAND_DESC[@]}" )
+
 TITLE="Select a command to run:"
 show_menu_quit
 command_selection="$?"
